@@ -161,13 +161,13 @@ let BattleAbilities = {
 	"arenatrap": {
 		desc: "Prevents adjacent opposing Pokémon from choosing to switch out unless they are immune to trapping or are airborne.",
 		shortDesc: "Prevents adjacent foes from choosing to switch unless they are airborne.",
-		onFoeTrapPokémon(pokemon) {
+		onFoeTrapPokemon(pokemon) {
 			if (!this.isAdjacent(pokemon, this.effectData.target)) return;
 			if (pokemon.isGrounded()) {
 				pokemon.tryTrap(true);
 			}
 		},
-		onFoeMaybeTrapPokémon(pokemon, source) {
+		onFoeMaybeTrapPokemon(pokemon, source) {
 			if (!source) source = this.effectData.target;
 			if (!source || !this.isAdjacent(pokemon, source)) return;
 			if (pokemon.isGrounded(!pokemon.knownType)) { // Negate immunity if the type is unknown
@@ -523,7 +523,7 @@ let BattleAbilities = {
 	},
 	"corrosion": {
 		shortDesc: "This Pokémon can poison or badly poison other Pokémon regardless of their typing.",
-		// Implemented in sim/pokemon.js:Pokémon#setStatus
+		// Implemented in sim/pokemon.js:Pokemon#setStatus
 		id: "corrosion",
 		name: "Corrosion",
 		rating: 2.5,
@@ -1158,7 +1158,7 @@ let BattleAbilities = {
 		desc: "On switch-in, this Pokémon is alerted to the move with the highest power, at random, known by an opposing Pokémon.",
 		shortDesc: "On switch-in, this Pokémon is alerted to the foes' move with the highest power.",
 		onStart(pokemon) {
-			/**@type {(Move|Pokémon)[][]} */
+			/**@type {(Move|Pokemon)[][]} */
 			let warnMoves = [];
 			let warnBp = 1;
 			for (const target of pokemon.side.foe.active) {
@@ -2092,12 +2092,12 @@ let BattleAbilities = {
 	"magnetpull": {
 		desc: "Prevents adjacent opposing Steel-type Pokémon from choosing to switch out unless they are immune to trapping.",
 		shortDesc: "Prevents adjacent Steel-type foes from choosing to switch.",
-		onFoeTrapPokémon(pokemon) {
+		onFoeTrapPokemon(pokemon) {
 			if (pokemon.hasType('Steel') && this.isAdjacent(pokemon, this.effectData.target)) {
 				pokemon.tryTrap(true);
 			}
 		},
-		onFoeMaybeTrapPokémon(pokemon, source) {
+		onFoeMaybeTrapPokemon(pokemon, source) {
 			if (!source) source = this.effectData.target;
 			if (!source || !this.isAdjacent(pokemon, source)) return;
 			if (!pokemon.knownType || pokemon.hasType('Steel')) {
@@ -2454,7 +2454,7 @@ let BattleAbilities = {
 	"neutralizinggas": {
 		desc: "If the Pokémon with Neutralizing Gas is in the battle, the effects of all Pokémon's Abilities will be nullified or will not be triggered.",
 		shortDesc: "Nullifies abilities while on the field.",
-		// Ability suppression implemented in sim/pokemon.ts:Pokémon#ignoringAbility
+		// Ability suppression implemented in sim/pokemon.ts:Pokemon#ignoringAbility
 		// TODO Will abilities that already started start again? (Intimidate seems like a good test case)
 		onPreStart(pokemon) {
 			this.add('-ability', pokemon, 'Neutralizing Gas');
@@ -2465,11 +2465,11 @@ let BattleAbilities = {
 			// gathers events to run after the switch and then runs them when the ability is no longer accessible.
 			// (If your tackling this, do note extreme weathers have the same issue)
 
-			// Mark this pokemon's ability as ending so Pokémon#ignoringAbility skips it
+			// Mark this pokemon's ability as ending so Pokemon#ignoringAbility skips it
 			source.abilityData.ending = "true";
 			for (const pokemon of this.getAllActive()) {
 				if (pokemon !== source) {
-					// Will be suppressed by Pokémon#ignoringAbility if needed
+					// Will be suppressed by Pokemon#ignoringAbility if needed
 					this.singleEvent('Start', this.dex.getAbility(pokemon.ability), pokemon.abilityData, pokemon);
 				}
 			}
@@ -3426,12 +3426,12 @@ let BattleAbilities = {
 	"shadowtag": {
 		desc: "Prevents adjacent opposing Pokémon from choosing to switch out unless they are immune to trapping or also have this Ability.",
 		shortDesc: "Prevents adjacent foes from choosing to switch unless they also have this Ability.",
-		onFoeTrapPokémon(pokemon) {
+		onFoeTrapPokemon(pokemon) {
 			if (!pokemon.hasAbility('shadowtag') && this.isAdjacent(pokemon, this.effectData.target)) {
 				pokemon.tryTrap(true);
 			}
 		},
-		onFoeMaybeTrapPokémon(pokemon, source) {
+		onFoeMaybeTrapPokemon(pokemon, source) {
 			if (!source) source = this.effectData.target;
 			if (!source || !this.isAdjacent(pokemon, source)) return;
 			if (!pokemon.hasAbility('shadowtag')) {
@@ -3908,7 +3908,7 @@ let BattleAbilities = {
 	"stickyhold": {
 		shortDesc: "This Pokémon cannot lose its held item due to another Pokémon's attack.",
 		onTakeItem(item, pokemon, source) {
-			if (this.suppressingAttackEvents() && pokemon !== this.activePokémon || !pokemon.hp || pokemon.item === 'stickybarb') return;
+			if (this.suppressingAttackEvents() && pokemon !== this.activePokemon || !pokemon.hp || pokemon.item === 'stickybarb') return;
 			if (!this.activeMove) throw new Error("Battle.activeMove is null");
 			if ((source && source !== pokemon) || this.activeMove.id === 'knockoff') {
 				this.add('-activate', pokemon, 'ability: Sticky Hold');
@@ -4344,12 +4344,12 @@ let BattleAbilities = {
 		onAnyModifyBoost(boosts, target) {
 			let source = this.effectData.target;
 			if (source === target) return;
-			if (source === this.activePokémon && target === this.activeTarget) {
+			if (source === this.activePokemon && target === this.activeTarget) {
 				boosts['def'] = 0;
 				boosts['spd'] = 0;
 				boosts['evasion'] = 0;
 			}
-			if (target === this.activePokémon && source === this.activeTarget) {
+			if (target === this.activePokemon && source === this.activeTarget) {
 				boosts['atk'] = 0;
 				boosts['def'] = 0;
 				boosts['spa'] = 0;
